@@ -30,6 +30,10 @@ private:
 
 	UPROPERTY(VisibleAnywhere, Category = Camera)
 	class UCameraComponent* FollowCamera;
+
+	// Exposing to blueprint
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
+	class UWidgetComponent* OverheadWidget;
 public:	
 	
 
