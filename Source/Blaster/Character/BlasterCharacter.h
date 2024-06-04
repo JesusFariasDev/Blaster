@@ -15,6 +15,7 @@ public:
 	ABlasterCharacter();
 	virtual void Tick(float DeltaTime) override;
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
+	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 
 protected:
 	virtual void BeginPlay() override;
@@ -34,7 +35,18 @@ private:
 	// Exposing to blueprint
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
 	class UWidgetComponent* OverheadWidget;
+
+	// Making the variable replicable, but just replicable from server to client
+	UPROPERTY(ReplicatedUsing = OnRep_OverlappingWeapon)
+	class AWeapon* OverlappingWeapon;
+
+	// Receiving the variable and notice just the client that actually overlapping weapon 
+	UFUNCTION()
+	// To access OverlappingWeapon with a null value we must store the last weapon value
+	void OnRep_OverlappingWeapon(AWeapon* LastWeapon);
+
 public:	
-	
+	// Notice the server overlapping weapon 
+	void SetOverlappingWeapon(AWeapon* Weapon);
 
 };
