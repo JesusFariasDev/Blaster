@@ -59,7 +59,7 @@ void AWeapon::OnSphereOverlap(UPrimitiveComponent* OverlappedComponent, AActor* 
 {
 	// Overlapping the sphere will cast widget to ABlasterCharacter type (otherActor represents the weapon widget)
 	ABlasterCharacter* BlasterCharacter = Cast<ABlasterCharacter>(OtherActor);
-	if (PickupWidget)
+	if (BlasterCharacter && PickupWidget)
 	{
 		PickupWidget->SetVisibility(true);
 	}
