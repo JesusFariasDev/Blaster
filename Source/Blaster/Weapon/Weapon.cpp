@@ -3,6 +3,8 @@
 
 #include "Weapon.h"
 #include "Components/SphereComponent.h"
+#include "Components/WidgetComponent.h"
+#include "Blaster/Character/BlasterCharacter.h"
 
 AWeapon::AWeapon()
 {
@@ -12,8 +14,6 @@ AWeapon::AWeapon()
 
 	// Instantiating Unreal component and setting up
 	WeaponMesh = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("WeaponMesh"));
-	WeaponMesh->SetupAttachment(RootComponent);
-
 	// Setting up the root connection
 	SetRootComponent(WeaponMesh);
 
@@ -33,6 +33,8 @@ AWeapon::AWeapon()
 	// Setting sphere to disable collisions
 	AreaSphere->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 
+	PickupWidget = CreateDefaultSubobject<UWidgetComponent>(TEXT("PickupWidget"));
+	PickupWidget->SetupAttachment(RootComponent);
 }
 
 void AWeapon::BeginPlay()
@@ -44,6 +46,22 @@ void AWeapon::BeginPlay()
 	{
 		AreaSphere->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
 		AreaSphere->SetCollisionResponseToChannel(ECollisionChannel::ECC_Pawn, ECollisionResponse::ECR_Overlap);
+		// This line is calling OnComponentBeginOverlap delegate and AddDynamics is using the OnSphereOverlap content as the parameters
+		AreaSphere->OnComponentBeginOverlap.AddDynamic(this, &AWeapon::OnSphereOverlap);
+	}
+	if (PickupWidget)
+	{
+		PickupWidget->SetVisibility(false);
+	}
+}
+
+void AWeapon::OnSphereOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
+{
+	// Overlapping the sphere will cast widget to ABlasterCharacter type (otherActor represents the weapon widget)
+	ABlasterCharacter* BlasterCharacter = Cast<ABlasterCharacter>(OtherActor);
+	if (PickupWidget)
+	{
+		PickupWidget->SetVisibility(true);
 	}
 }
 
